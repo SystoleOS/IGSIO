@@ -4,7 +4,6 @@ IF (IGSIO_USE_3DSlicer)
   FIND_PACKAGE(Slicer REQUIRED)
 ELSE()
   FIND_PACKAGE(vtkAddon REQUIRED)
-  INCLUDE(${vtkAddon_DIR}/vtkAddonTargets.cmake)
 ENDIF()
 
 # --------------------------------------------------------------------------
