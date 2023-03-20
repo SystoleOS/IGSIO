@@ -16,6 +16,10 @@ SET(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
   )
 
+IF(NOT DEFINED IGSIO_NO_DEVELOPMENT_INSTALL)
+  SET(IGSIO_NO_DEVELOPMENT_INSTALL ON)
+ENDIF()
+
 # --------------------------------------------------------------------------
 # System Settings
 IF(WIN32)
@@ -50,13 +54,21 @@ IF(NOT IGSIO_INSTALL_LIB_DIR)
   SET(IGSIO_INSTALL_LIB_DIR "lib")
 ENDIF()
 
-IF(NOT IGSIO_INSTALL_DATA_DIR)
-  SET(IGSIO_INSTALL_DATA_DIR "share")
+IF(NOT IGSIO_INSTALL_SHARE_DIR)
+  SET(IGSIO_INSTALL_SHARE_DIR "share")
 ENDIF()
 
 SET(IGSIO_INSTALL_FOLDERNAME "IGSIO-${IGSIO_VERSION_MAJOR}.${IGSIO_VERSION_MINOR}")
-IF(NOT IGSIO_INCLUDE_INSTALL )
-  SET(IGSIO_INCLUDE_INSTALL "include/${IGSIO_INSTALL_FOLDERNAME}")
+IF(NOT IGSIO_INSTALL_INCLUDE_DIR )
+  SET(IGSIO_INSTALL_INCLUDE_DIR "include/${IGSIO_INSTALL_FOLDERNAME}")
+ENDIF()
+
+IF(NOT IGSIO_INSTALL_DATA_DIR)
+  SET(IGSIO_INSTALL_DATA_DIR "${IGSIO_INSTALL_SHARE_DIR}/data")
+ENDIF()
+
+IF(NOT IGSIO_INSTALL_CMAKE_DIR)
+  SET(IGSIO_INSTALL_CMAKE_DIR "${IGSIO_INSTALL_SHARE_DIR}/${IGSIO_INSTALL_FOLDERNAME}/cmake")
 ENDIF()
 
 IF(NOT DEFINED BUILD_SHARED_LIBS)
@@ -179,8 +191,8 @@ ELSE()
   endif()
   unset(_igsio_targets)
 
-  # Create an IGSIOConfig.cmake and IGSIOConfig Version.cmake file for the use from the build tree
   #-----------------------------------------------------------------------------
+  # Create an IGSIOConfig.cmake and IGSIOConfig Version.cmake file for the use from the build tree
   INCLUDE(CMakePackageConfigHelpers)
   write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/IGSIOConfigVersion.cmake"
@@ -188,5 +200,19 @@ ELSE()
     COMPATIBILITY ExactVersion)
   LIST(APPEND IGSIO_INSTALL_CMAKE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/IGSIOConfigVersion.cmake")
   INCLUDE(${CMAKE_SOURCE_DIR}/CMake/GenerateIGSIOConfig.cmake)
+
+  #-----------------------------------------------------------------------------
+  # Install development files
+  IF(NOT IGSIO_NO_DEVELOPMENT_INSTALL)
+    LIST(APPEND IGSIO_CMAKE_FILES ${CMAKE_CURRENT_BINARY_DIR}/install/IGSIOConfig.cmake)
+    INSTALL(FILES ${IGSIO_CMAKE_FILES}
+      DESTINATION ${IGSIO_INSTALL_CMAKE_DIR}
+      COMPONENT Development)
+
+    LIST(APPEND IGSIO_CONFIGURE_HEADER ${CMAKE_CURRENT_BINARY_DIR}/igsioConfigure.h)
+    INSTALL(FILES ${IGSIO_CONFIGURE_HEADER}
+      DESTINATION ${IGSIO_INSTALL_INCLUDE_DIR}
+      COMPONENT Development)
+  ENDIF()
 
 ENDIF()

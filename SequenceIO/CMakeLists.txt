@@ -79,6 +79,8 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   PRIVATE ${${PROJECT_NAME}_LIBS_PRIVATE}
   )
 
+#-----------------------------------------------------------------------------
+# Install the library files
 INSTALL(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
   RUNTIME DESTINATION ${IGSIO_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
   LIBRARY DESTINATION ${IGSIO_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
@@ -94,6 +96,15 @@ GENERATE_EXPORT_HEADER(${PROJECT_NAME})
 SET_PROPERTY(GLOBAL APPEND PROPERTY IGSIO_TARGETS ${PROJECT_NAME})
 
 SET(${PROJECT_NAME}_INCLUDE_DIRS ${${PROJECT_NAME}_INCLUDE_DIRS} CACHE INTERNAL "")
+
+#-----------------------------------------------------------------------------
+# Install the development files
+IF(NOT IGSIO_NO_DEVELOPMENT_INSTALL)
+  FILE(GLOB ${PROJECT_NAME}_HEADERS "*.h")
+  FILE(GLOB ${PROJECT_NAME}_GENERATED_HEADERS "${CMAKE_CURRENT_BINARY_DIR}/*.h")
+  INSTALL(FILES ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_GENERATED_HEADERS}
+    DESTINATION ${IGSIO_INSTALL_INCLUDE_DIR})
+ENDIF()
 
 # --------------------------------------------------------------------------
 # Testing
